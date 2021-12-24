@@ -1,15 +1,31 @@
-filePath: 'C:/Users/adnan.sait/Desktop'
-fileDestinationPath: 'D:/data/daily activity sheets'
-fileExtension: '.xlsx'
+filePath: "C:/Users/adnan/OneDrive/Desktop"
+fileDestinationPath: "D:/data/daily activity sheets"
+fileExtension: ".xlsx"
 taskSheetTitleRegex: ([\d]{2}[-]){2}([\d]{4}).[.]*
 taskTrackerTemplatePath: template/Task_Tracker-Template.xlsx
-excelConfiguration: {
-  sheetNames: ['Sheet1', 'Consolidated', 'Hours'],
-  dataTableColumns: {"date": "Date", "category": "Task", "project": "Project","task": "TaskName",
-  "type": "Type", "startTime": "Start", "endTime": "End", "duration": "Time Elapsed", "description": "Work Done",
-  "prayer": "Prayer", "morning": "Morning"},
-  categoryDict: {"work": "work", "break": "break", "lunch": "lunch"},
-  cellAddress: {"taskName": "D2", "taskType": "E2"},
-}
-"defaultPrayer": False
-"defaultProject": ["Lunch", "-"]
+excelConfiguration:
+  {
+    sheetNames: ["Sheet1", "Consolidated", "Hours"],
+    dataTableColumns:
+      {
+        "date": "Date",
+        "category": "Task",
+        "project": "Project",
+        "task": "TaskName",
+        "type": "Type",
+        "startTime": "Start",
+        "endTime": "End",
+        "duration": "Time Elapsed",
+        "description": "Work Done",
+        "prayer": "Prayer",
+        "morning": "Morning",
+      },
+    categoryDict: { "work": "work", "break": "break", "lunch": "lunch" },
+    cellAddress: { "taskName": "D2", "taskType": "E2" },
+  }
+defaultPrayer: False
+defaultProject: ["Lunch", "-"]
+useDatabase: False
+
+# Master Worksheet Config
+masterSheetPath: "C:/Projects/Personal/task-tracker/template/MasterSheet.xlsx"

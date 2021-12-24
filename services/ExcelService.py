@@ -11,7 +11,7 @@ from models.DailyActivity import DailyActivity
 from models.DayOverview import DayOverview
 from models.Project import Project
 from models.Task import Task
-import database.ExcelDatabase as excelDatabase
+from services.MasterWorkbookService import MasterWorkbookService
 from utilities.Constants import Constants
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.worksheet.worksheet import Worksheet
@@ -39,7 +39,12 @@ CATEGORY_CONST_DICT = configurationValues['excelConfiguration']['categoryDict']
 PRAYER_DEFAULT = configurationValues['defaultPrayer']
 CELL_IDENTIFIER = configurationValues['excelConfiguration']['cellAddress']
 DEFAULT_PROJECT = configurationValues['defaultProject']
+USE_DATABASE = configurationValues["useDatabase"]
 
+if (USE_DATABASE == "True"):
+    import database.ExcelDatabase as excelDatabase
+else:
+    excelDatabase = MasterWorkbookService(configurationValues["masterSheetPath"])
 
 def parseUnixTime(fileName: str) -> float:
     """Parses the Unix timestamp from the file name
@@ -262,6 +267,12 @@ def getExcelFileNamesToBeProcessed() -> list:
         list -- [description]
     """
     fileList = os.listdir(FILE_PATH)
+    # for fileName in fileList:
+    #     print(configurationValues['fileExtension'] in fileName)
+    #     print(not fileName.startswith("~$"))
+    #     patternObj = re.compile("([0-9]{2}[-]){2}([0-9]{4}).[.]*")
+    #     matchResult = re.match(patternObj, fileName)
+    #     print(bool(matchResult))
     taskFileNameList = [fileName for fileName in fileList if (configurationValues['fileExtension'] in fileName)
     and (not fileName.startswith("~$") and (re.match(configurationValues["taskSheetTitleRegex"], fileName)))]
     taskFileNameList.sort(key = parseUnixTime, reverse=True)
