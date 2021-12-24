@@ -31,8 +31,9 @@ def readDailyActivitySheet(fileName:str, sheetNames:list):
         dayOverview = excelService.populateDayOverview(taskDataConsolidated, overviewSheetData)
         excelService.saveDailyActivityListAndDayOverview(dailyActivityList, dayOverview)
         try:
+            excelFile.close()
             excelService.deleteFile(fileName)
-        except:
+        except Exception as e:
             print("Unable to delete file,", fileName)
     except Exception as e:
         print("Error while processing file,", fileName)
