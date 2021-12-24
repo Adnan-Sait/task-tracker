@@ -36,6 +36,7 @@ BEGIN;
 		"projectId" serial,
 		"projectName" character varying(255) UNIQUE,
 		"startTimestamp" timestamp with time zone NOT NULL,
+		"status" integer NOT NULL,
 		"description" text,
 		"createdTimestamp" timestamp with time zone DEFAULT current_timestamp,
 		"modifiedTimestamp" timestamp with time zone DEFAULT current_timestamp,
