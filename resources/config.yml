@@ -25,7 +25,8 @@ excelConfiguration:
   }
 defaultPrayer: False
 defaultProject: ["Lunch", "-"]
+
 useDatabase: False
 
 # Master Worksheet Config
-masterSheetPath: "C:/Projects/Personal/task-tracker/template/MasterSheet.xlsx"
+masterSheetPath: "template/MasterSheet.xlsx"
