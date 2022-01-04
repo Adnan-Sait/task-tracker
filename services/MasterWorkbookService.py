@@ -15,6 +15,7 @@ from openpyxl import load_workbook
 class MasterWorkbookService(DataRepository):
 
     def __init__(self, filePath: str):
+        self.filePath = os.path.abspath(filePath)
         self.excelFile = pd.ExcelFile(filePath)
         self.projectNameProjectListDict = self.__getProjectNameProjectListDictionary(
             self.excelFile, "Project")
@@ -22,7 +23,7 @@ class MasterWorkbookService(DataRepository):
         self.projectIdTaskListDict = self.__getProjectIdTaskListDictionary(
             self.excelFile, "Task")
         self.morningScheduleIdDetailsDict = self.__getMorningScheduleIdDetailsDictionary(self.excelFile, "MorningSchedule")
-        self.taskTrackerMasterFile = load_workbook(os.path.abspath("template/MasterSheet.xlsx"))
+        self.taskTrackerMasterFile = load_workbook(filePath)
 
     def __del__(self):
         self.taskTrackerMasterFile.close()
@@ -70,18 +71,17 @@ class MasterWorkbookService(DataRepository):
 
         return dailyActivityList
 
-
     def getTaskId(self, projectId: int, taskName: str) -> int:
         taskList = self.projectIdTaskListDict.get(projectId)
         if (taskList):
             for task in taskList:
-                if (task.taskName == taskName):
+                if (task.taskName.lower() == taskName.lower()):
                     return task.taskId
         raise Exception(
             f"No task with projectId, {projectId} and taskName, {taskName}")
 
     def getProjectId(self, projectName: str) -> int:
-        project = self.projectNameProjectListDict.get(projectName)
+        project = self.projectNameProjectListDict.get(projectName.lower())
         if (project):
             return project.projectId
         else:
@@ -131,12 +131,10 @@ class MasterWorkbookService(DataRepository):
         activeTasks = []
         taskList = self.projectIdTaskListDict.get(projectId)
         if (taskList is None):
-            return None
+            raise Exception(f"No project with projectId, {projectId}")
         for task in taskList:
             if (task.status == "ACTIVE"):
                 activeTasks.append(task)
-        if (len(activeTasks) == 0):
-            return None
         return activeTasks
 
     def getTaskTypes(self) -> list:
@@ -144,12 +142,10 @@ class MasterWorkbookService(DataRepository):
         taskTypeList = []
         for index in range(len(tasksTypeSheetData["taskTypeName"])):
             taskTypeList.append(tasksTypeSheetData["taskTypeName"][index])
-        if (len(taskTypeList) == 0):
-            return None
         return taskTypeList
     
     def commit(self):
-        self.taskTrackerMasterFile.save(os.path.abspath("template/MasterSheet.xlsx"))
+        self.taskTrackerMasterFile.save(self.filePath)
 
     def __getProjectNameProjectListDictionary(self, excelFile: ExcelFile, projectSheetName: str) -> dict:
         projectSheetData = excelFile.parse(projectSheetName, 0)
@@ -161,7 +157,7 @@ class MasterWorkbookService(DataRepository):
             project.startTimestamp = projectSheetData["startTimestamp"][index]
             project.status = projectSheetData["status"][index]
             project.description = projectSheetData["description"][index]
-            projectIdProjectDict[project.projectName] = project
+            projectIdProjectDict[project.projectName.lower()] = project
         return projectIdProjectDict
 
     def __getProjectIdTaskListDictionary(self, excelFile: ExcelFile, taskSheetName: str) -> dict:
