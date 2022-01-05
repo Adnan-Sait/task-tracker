@@ -1,4 +1,6 @@
 import yaml
+import time
+
 from config.DatabaseConfig import DatabaseConfig
 
 DatabaseConfig.initializeConnection()
@@ -9,11 +11,21 @@ configurationValues = {}
 with open("./resources/config.yml") as configFile:
     configurationValues = yaml.load(configFile, Loader=yaml.FullLoader)
  
+fileCount = 0
 try:
-    fileNameList = excelController.getNameOfFilesToBeProcessed()
-    for fileName in fileNameList:
-        excelController.readDailyActivitySheet(fileName, configurationValues['excelConfiguration']['sheetNames'])
-except Exception as e:
-    print(e)
- 
-excelController.createTaskTrackerWorkbook()
+    try:
+        fileNameList = excelController.getNameOfFilesToBeProcessed()
+        for fileName in fileNameList:
+            excelController.readDailyActivitySheet(fileName, configurationValues['excelConfiguration']['sheetNames'])
+            fileCount += 1
+    except Exception as e:
+        print(e)
+    finally:
+        print("# of Files Processed: ", fileCount)
+    
+    excelController.createTaskTrackerWorkbook()
+    print("Created file")
+    while (True):
+        time.sleep(10)
+except KeyboardInterrupt as e:
+    print("Interrupted")
