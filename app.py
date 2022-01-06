@@ -1,15 +1,16 @@
 import yaml
 import time
 
-from config.DatabaseConfig import DatabaseConfig
-
-DatabaseConfig.initializeConnection()
 import controllers.ExcelController as excelController
 
 configurationValues = {}
 # Load configuration values
 with open("./resources/config.yml") as configFile:
     configurationValues = yaml.load(configFile, Loader=yaml.FullLoader)
+
+if (configurationValues["useDatabase"]):
+    from config.DatabaseConfig import DatabaseConfig
+    DatabaseConfig.initializeConnection()
  
 fileCount = 0
 try:
@@ -25,7 +26,5 @@ try:
     
     excelController.createTaskTrackerWorkbook()
     print("Created file")
-    while (True):
-        time.sleep(10)
 except KeyboardInterrupt as e:
     print("Interrupted")
