@@ -26,7 +26,5 @@ try:
     
     excelController.createTaskTrackerWorkbook()
     print("Created file")
-    while (True):
-        time.sleep(10)
 except KeyboardInterrupt as e:
     print("Interrupted")
