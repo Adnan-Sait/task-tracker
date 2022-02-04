@@ -308,14 +308,10 @@ def createTaskTrackerWorkbook():
     fileName = datetime.datetime.now().strftime("%m-%d-%Y"+".xlsx")
     
     consolidationSheet = taskTrackerFile["Consolidated"]
-    logSheet = taskTrackerFile["Sheet1"]
     projectTaskMapping = taskTrackerFile["Project-Task Mapping"]
-    
-    dataValidationDict = {}
-    dataValidationDict[CELL_IDENTIFIER["taskName"]] = Constants.TASK_DATA_VALIDATION
-    taskTypeList = excelDatabase.getTaskTypes()
-    dataValidationDict[CELL_IDENTIFIER["taskType"]] = '"'+", ".join(taskTypeList)+'"'
-    addDataValidation(logSheet, dataValidationDict)
+    taskTypesSheet = taskTrackerFile["TaskTypes"]
+
+    saveTaskTypesinSheet(taskTypesSheet)
     saveActiveProjectTaskMapping(projectTaskMapping)
     consolidationSheet.cell(row = 2, column = 6).value = datetime.datetime.now().strftime("%I:%M %p")
     taskTrackerFile.save(FILE_PATH+"/"+fileName)
@@ -386,6 +382,23 @@ def saveActiveProjectTaskMapping(worksheet:Worksheet, startRow:int = 1, startCol
             row += 1
             worksheet.cell(row=row, column=column).value = task.taskName
         column += 1
+
+def saveTaskTypesinSheet(worksheet:Worksheet, startRow:int = 2, column:int = 1):
+    """
+    Saves the task types in the specified sheet
+
+    Arguments:
+        worksheet {Worksheet} -- The sheet in which the task types will be saved
+        startRow {int} -- starting row from where the data should be stored
+        column {int} -- the column in which the tasks will be saved
+    """
+    taskTypes = excelDatabase.getTaskTypes()
+    if taskTypes is None:
+        return
+    row = startRow
+    for taskType in taskTypes:
+        worksheet.cell(row=row, column=column).value = taskType
+        row += 1
 
 def getLeavingTime(sheetData: DataFrame) -> datetime:
     """Get the leaving time in the defined in the dataframe
