@@ -11,6 +11,7 @@ from table_models.ProjectTable import ProjectTable
 from table_models.TaskTable import TaskTable
 
 from openpyxl import load_workbook
+from openpyxl.worksheet.worksheet import Worksheet
 
 class MasterWorkbookService(DataRepository):
 
@@ -25,6 +26,13 @@ class MasterWorkbookService(DataRepository):
         self.morningScheduleIdDetailsDict = self.__getMorningScheduleIdDetailsDictionary(self.excelFile, "MorningSchedule")
         self.taskTrackerMasterFile = load_workbook(filePath)
 
+        self.currentDailyActivityRow = self.__getTotalRowsCount("DailyActivity", "dateRecorded") + 1
+        self.currentDayOverviewRow = self.__getTotalRowsCount("DayOverview", "dateRecorded") + 1
+
+    def __getTotalRowsCount(self, sheetName: str, headerName: str) -> int:
+        sheetData = self.excelFile.parse(sheetName, 0)
+        return len(sheetData[headerName])
+
     def __del__(self):
         self.taskTrackerMasterFile.close()
         self.excelFile.close()
@@ -32,42 +40,34 @@ class MasterWorkbookService(DataRepository):
     def saveDailyActivity(self, dailyActivity: DailyActivity) -> DailyActivity:
         dailyActivitySheet = self.taskTrackerMasterFile["DailyActivity"]
 
-        dailyActivitySheetData = self.excelFile.parse("DailyActivity", 0)
-
-        totalRowsofData = len(dailyActivitySheetData["dateRecorded"])
-
-        row = totalRowsofData+2
+        self.currentDailyActivityRow += 1
         column = 1
 
         # write to master sheet
-        dailyActivitySheet.cell(row=row, column=column).value = dailyActivity.getDate()
+        dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = dailyActivity.getDate()
         column += 1
-        dailyActivitySheet.cell(row=row, column=column).value = self.taskIdTaskDetailsDict.get(dailyActivity.getTaskId()).taskName
+        dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = self.taskIdTaskDetailsDict.get(dailyActivity.getTaskId()).taskName
         column += 1
-        dailyActivitySheet.cell(row=row, column=column).value = dailyActivity.getEffort()
+        dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = dailyActivity.getEffort()
         column += 1
-        dailyActivitySheet.cell(row=row, column=column).value = dailyActivity.getDescription()
+        dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = dailyActivity.getDescription()
 
         return dailyActivity
 
-    def saveBulkDailyActivity(self, dailyActivityList: list) -> list:
+    def saveBulkDailyActivity(self, dailyActivityList: list[DailyActivity]) -> list[DailyActivity]:
         dailyActivitySheet = self.taskTrackerMasterFile["DailyActivity"]
-        dailyActivitySheetData = self.excelFile.parse("DailyActivity", 0)
-        totalRowsofData = len(dailyActivitySheetData["dateRecorded"])
-
-        row = totalRowsofData+2
 
         # write to master sheet
         for dailyActivity in dailyActivityList:
+            self.currentDailyActivityRow += 1
             column = 1
-            dailyActivitySheet.cell(row=row, column=column).value = dailyActivity.getDate()
+            dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = dailyActivity.getDate()
             column += 1
-            dailyActivitySheet.cell(row=row, column=column).value = self.taskIdTaskDetailsDict.get(dailyActivity.getTaskId()).taskName
+            dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = self.taskIdTaskDetailsDict.get(dailyActivity.getTaskId()).taskName
             column += 1
-            dailyActivitySheet.cell(row=row, column=column).value = dailyActivity.getEffort()
+            dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = dailyActivity.getEffort()
             column += 1
-            dailyActivitySheet.cell(row=row, column=column).value = dailyActivity.getDescription()
-            row += 1
+            dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = dailyActivity.getDescription()
 
         return dailyActivityList
 
@@ -89,28 +89,26 @@ class MasterWorkbookService(DataRepository):
 
     def saveDayOverview(self, dayOverview: DayOverview) -> bool:
         dayOverviewSheet = self.taskTrackerMasterFile["DayOverview"]
-        dayOverviewSheetData = self.excelFile.parse("DayOverview", 0)
-        totalRowsofData = len(dayOverviewSheetData["dateRecorded"])
 
-        row = totalRowsofData+2
+        self.currentDayOverviewRow += 1
         column = 1
 
         # write to master sheet
-        dayOverviewSheet.cell(row=row, column=column).value = dayOverview.dateRecorded
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = dayOverview.dateRecorded
         column += 1
-        dayOverviewSheet.cell(row=row, column=column).value = dayOverview.startTime
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = dayOverview.startTime
         column += 1
-        dayOverviewSheet.cell(row=row, column=column).value = dayOverview.leavingTime
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = dayOverview.leavingTime
         column += 1
-        dayOverviewSheet.cell(row=row, column=column).value = dayOverview.workHours
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = dayOverview.workHours
         column += 1
-        dayOverviewSheet.cell(row=row, column=column).value = dayOverview.breakHours
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = dayOverview.breakHours
         column += 1
-        dayOverviewSheet.cell(row=row, column=column).value = dayOverview.lunchDuration
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = dayOverview.lunchDuration
         column += 1
-        dayOverviewSheet.cell(row=row, column=column).value = dayOverview.prayer
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = dayOverview.prayer
         column += 1
-        dayOverviewSheet.cell(row=row, column=column).value = self.morningScheduleIdDetailsDict[dayOverview.morningScheduleId]["morningScheduleRepresentation"]
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = self.morningScheduleIdDetailsDict[dayOverview.morningScheduleId]["morningScheduleRepresentation"]
 
         return dayOverview
 
