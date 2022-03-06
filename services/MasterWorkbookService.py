@@ -123,13 +123,14 @@ class MasterWorkbookService(DataRepository):
                 activeProjects.append(project[1])
         if (len(activeProjects) == 0):
             return None
+        activeProjects.sort(key=lambda x: x.projectName)
         return activeProjects
 
     def getActiveTasksByProjectId(self, projectId: int) -> list:
         activeTasks = []
         taskList = self.projectIdTaskListDict.get(projectId)
         if (taskList is None):
-            raise Exception(f"No project with projectId, {projectId}")
+            raise Exception(f"No tasks linked with projectId, {projectId}")
         for task in taskList:
             if (task.status == "ACTIVE"):
                 activeTasks.append(task)
