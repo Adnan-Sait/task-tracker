@@ -306,6 +306,10 @@ def createTaskTrackerWorkbook():
     """
     taskTrackerFile = load_workbook(os.path.abspath(TASK_TRACKER_TEMPLATE_PATH))
     fileName = datetime.datetime.now().strftime("%m-%d-%Y"+".xlsx")
+
+    logSheet = taskTrackerFile["Sheet1"]
+    dataValidationDict = {}
+    dataValidationDict[CELL_IDENTIFIER["taskName"]] = Constants.TASK_DATA_VALIDATION
     
     consolidationSheet = taskTrackerFile["Consolidated"]
     projectTaskMapping = taskTrackerFile["Project-Task Mapping"]
@@ -314,6 +318,7 @@ def createTaskTrackerWorkbook():
     saveTaskTypesinSheet(taskTypesSheet)
     saveActiveProjectTaskMapping(projectTaskMapping)
     consolidationSheet.cell(row = 2, column = 6).value = datetime.datetime.now().strftime("%I:%M %p")
+    addDataValidation(logSheet, dataValidationDict)
     taskTrackerFile.save(FILE_PATH+"/"+fileName)
 
 def addDataValidation(worksheet:Worksheet, cellFormulaDict:dict):
@@ -328,10 +333,6 @@ def addDataValidation(worksheet:Worksheet, cellFormulaDict:dict):
         taskDataValidation = DataValidation(type="list", formula1=cellFormulaDict[CELL_IDENTIFIER["taskName"]], allow_blank=False)
         worksheet.add_data_validation(taskDataValidation)
         taskDataValidation.add(CELL_IDENTIFIER["taskName"])
-    if cellFormulaDict[CELL_IDENTIFIER["taskType"]] is not None:
-        taskTypeDataValidation = DataValidation(type="list", formula1=cellFormulaDict[CELL_IDENTIFIER["taskType"]], allow_blank=False)
-        worksheet.add_data_validation(taskTypeDataValidation)
-        taskTypeDataValidation.add(CELL_IDENTIFIER["taskType"])
 
 def getDefaultProjects() -> list:
     """Creates default projects as defined in the configuration
