@@ -220,7 +220,7 @@ def getMorningScheduleId(morningSchedule:str) -> int:
     Returns:
         int -- [description]
     """
-    morningScheduleMappingDict = {"B": 1, "B+SL": 2, "BC": 3, "BC+SL": 4, "SL": 5, "S": 6}
+    morningScheduleMappingDict = {"B": 1, "B+SL": 2, "BC": 3, "BC+SL": 4, "SL": 5, "S": 6, "LL": 7}
     return morningScheduleMappingDict[morningSchedule]
 
 def getDateRecordedFromFileName(filename:str) -> datetime.date:
