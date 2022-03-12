@@ -134,6 +134,7 @@ class MasterWorkbookService(DataRepository):
         for task in taskList:
             if (task.status == "ACTIVE"):
                 activeTasks.append(task)
+        activeTasks.sort(key= lambda x: x.taskName)
         return activeTasks
 
     def getTaskTypes(self) -> list:
