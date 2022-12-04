@@ -220,8 +220,15 @@ def getMorningScheduleId(morningSchedule:str) -> int:
     Returns:
         int -- [description]
     """
-    morningScheduleMappingDict = {"B": 1, "B+SL": 2, "BC": 3, "BC+SL": 4, "SL": 5, "S": 6, "LL": 7}
-    return morningScheduleMappingDict[morningSchedule]
+    if (USE_DATABASE == "True"):
+        morningScheduleMappingDict = {"B": 1, "B+SL": 2, "BC": 3, "BC+SL": 4, "SL": 5, "S": 6, "LL": 7}
+        return morningScheduleMappingDict[morningSchedule]
+
+    morningScheduleMappingDict = excelDatabase.morningScheduleIdDetailsDict
+    morningScheduleList = morningScheduleMappingDict.values()
+    for scheduleObj in morningScheduleList:
+        if (scheduleObj["morningScheduleRepresentation"] == morningSchedule):
+            return scheduleObj["morningScheduleId"]    
 
 def getDateRecordedFromFileName(filename:str) -> datetime.date:
     """Parses the date recorded from the file name
