@@ -13,6 +13,7 @@ from table_models.TaskTable import TaskTable
 from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
+
 class MasterWorkbookService(DataRepository):
 
     def __init__(self, filePath: str):
@@ -20,14 +21,18 @@ class MasterWorkbookService(DataRepository):
         self.excelFile = pd.ExcelFile(filePath)
         self.projectNameProjectListDict = self.__getProjectNameProjectListDictionary(
             self.excelFile, "Project")
-        self.taskIdTaskDetailsDict = self.__getTaskIdTaskDetailsDictionary(self.excelFile, "Task")
+        self.taskIdTaskDetailsDict = self.__getTaskIdTaskDetailsDictionary(
+            self.excelFile, "Task")
         self.projectIdTaskListDict = self.__getProjectIdTaskListDictionary(
             self.excelFile, "Task")
-        self.morningScheduleIdDetailsDict = self.__getMorningScheduleIdDetailsDictionary(self.excelFile, "MorningSchedule")
+        self.morningScheduleIdDetailsDict = self.__getMorningScheduleIdDetailsDictionary(
+            self.excelFile, "MorningSchedule")
         self.taskTrackerMasterFile = load_workbook(filePath)
 
-        self.currentDailyActivityRow = self.__getTotalRowsCount("DailyActivity", "dateRecorded") + 1
-        self.currentDayOverviewRow = self.__getTotalRowsCount("DayOverview", "dateRecorded") + 1
+        self.currentDailyActivityRow = self.__getTotalRowsCount(
+            "DailyActivity", "dateRecorded") + 1
+        self.currentDayOverviewRow = self.__getTotalRowsCount(
+            "DayOverview", "dateRecorded") + 1
 
     def __getTotalRowsCount(self, sheetName: str, headerName: str) -> int:
         sheetData = self.excelFile.parse(sheetName, 0)
@@ -44,13 +49,17 @@ class MasterWorkbookService(DataRepository):
         column = 1
 
         # write to master sheet
-        dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = dailyActivity.getDate()
+        dailyActivitySheet.cell(
+            row=self.currentDailyActivityRow, column=column).value = dailyActivity.getDate()
         column += 1
-        dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = self.taskIdTaskDetailsDict.get(dailyActivity.getTaskId()).taskName
+        dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = self.taskIdTaskDetailsDict.get(
+            dailyActivity.getTaskId()).taskName
         column += 1
-        dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = dailyActivity.getEffort()
+        dailyActivitySheet.cell(
+            row=self.currentDailyActivityRow, column=column).value = dailyActivity.getEffort()
         column += 1
-        dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = dailyActivity.getDescription()
+        dailyActivitySheet.cell(row=self.currentDailyActivityRow,
+                                column=column).value = dailyActivity.getDescription()
 
         return dailyActivity
 
@@ -61,13 +70,17 @@ class MasterWorkbookService(DataRepository):
         for dailyActivity in dailyActivityList:
             self.currentDailyActivityRow += 1
             column = 1
-            dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = dailyActivity.getDate()
+            dailyActivitySheet.cell(
+                row=self.currentDailyActivityRow, column=column).value = dailyActivity.getDate()
             column += 1
-            dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = self.taskIdTaskDetailsDict.get(dailyActivity.getTaskId()).taskName
+            dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = self.taskIdTaskDetailsDict.get(
+                dailyActivity.getTaskId()).taskName
             column += 1
-            dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = dailyActivity.getEffort()
+            dailyActivitySheet.cell(
+                row=self.currentDailyActivityRow, column=column).value = dailyActivity.getEffort()
             column += 1
-            dailyActivitySheet.cell(row=self.currentDailyActivityRow, column=column).value = dailyActivity.getDescription()
+            dailyActivitySheet.cell(row=self.currentDailyActivityRow,
+                                    column=column).value = dailyActivity.getDescription()
 
         return dailyActivityList
 
@@ -94,21 +107,29 @@ class MasterWorkbookService(DataRepository):
         column = 1
 
         # write to master sheet
-        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = dayOverview.dateRecorded
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow,
+                              column=column).value = dayOverview.dateRecorded
         column += 1
-        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = dayOverview.startTime
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow,
+                              column=column).value = dayOverview.startTime
         column += 1
-        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = dayOverview.leavingTime
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow,
+                              column=column).value = dayOverview.leavingTime
         column += 1
-        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = dayOverview.workHours
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow,
+                              column=column).value = dayOverview.workHours
         column += 1
-        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = dayOverview.breakHours
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow,
+                              column=column).value = dayOverview.breakHours
         column += 1
-        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = dayOverview.lunchDuration
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow,
+                              column=column).value = dayOverview.lunchDuration
         column += 1
-        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = dayOverview.prayer
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow,
+                              column=column).value = dayOverview.prayer
         column += 1
-        dayOverviewSheet.cell(row=self.currentDayOverviewRow, column=column).value = self.morningScheduleIdDetailsDict[dayOverview.morningScheduleId]["morningScheduleRepresentation"]
+        dayOverviewSheet.cell(row=self.currentDayOverviewRow,
+                              column=column).value = self.morningScheduleIdDetailsDict[dayOverview.morningScheduleId]["morningScheduleRepresentation"]
 
         return dayOverview
 
@@ -134,7 +155,7 @@ class MasterWorkbookService(DataRepository):
         for task in taskList:
             if (task.status == "ACTIVE"):
                 activeTasks.append(task)
-        activeTasks.sort(key= lambda x: x.taskName)
+        activeTasks.sort(key=lambda x: x.taskName)
         return activeTasks
 
     def getTaskTypes(self) -> list:
@@ -143,7 +164,7 @@ class MasterWorkbookService(DataRepository):
         for index in range(len(tasksTypeSheetData["taskTypeName"])):
             taskTypeList.append(tasksTypeSheetData["taskTypeName"][index])
         return taskTypeList
-    
+
     def commit(self):
         self.taskTrackerMasterFile.save(self.filePath)
 
@@ -199,8 +220,8 @@ class MasterWorkbookService(DataRepository):
             task.description = taskSheetData["description"][index]
             taskIdTaskDetailsDict[task.taskId] = task
         return taskIdTaskDetailsDict
-    
-    def __getMorningScheduleIdDetailsDictionary(self, excelFile:ExcelFile, morningScheduleSheetName:str) -> dict:
+
+    def __getMorningScheduleIdDetailsDictionary(self, excelFile: ExcelFile, morningScheduleSheetName: str) -> dict:
         morningScheduleIdDetailsDict = {}
         morningScheduleSheetData = excelFile.parse(morningScheduleSheetName, 0)
 
@@ -209,5 +230,6 @@ class MasterWorkbookService(DataRepository):
             morningScheduleObj["morningScheduleId"] = morningScheduleSheetData["morningScheduleId"][index]
             morningScheduleObj["morningScheduleRepresentation"] = morningScheduleSheetData["morningScheduleRepresentation"][index]
             morningScheduleObj["description"] = morningScheduleSheetData["description"][index]
-            morningScheduleIdDetailsDict[morningScheduleObj["morningScheduleId"]] = morningScheduleObj
+            morningScheduleIdDetailsDict[morningScheduleObj["morningScheduleId"]
+                                         ] = morningScheduleObj
         return morningScheduleIdDetailsDict

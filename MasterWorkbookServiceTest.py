@@ -4,11 +4,13 @@ from models.DailyActivity import DailyActivity
 
 from services.MasterWorkbookService import MasterWorkbookService
 
+
 class MasterWorkbookServiceTest(unittest.TestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.masterWorkbookService = MasterWorkbookService("C:/Projects/Personal/task-tracker/test_files/MasterSheet.xlsx")
+        self.masterWorkbookService = MasterWorkbookService(
+            "C:/Projects/Personal/task-tracker/test_files/MasterSheet.xlsx")
         self.activeProjects = self.masterWorkbookService.getActiveProjects()
 
     ##
@@ -23,7 +25,8 @@ class MasterWorkbookServiceTest(unittest.TestCase):
         self.assertEqual(taskId, 8)
 
     def testFailIncorrectProjectTaskMappingGetTaskId(self) -> None:
-        self.assertRaises(Exception, self.masterWorkbookService.getTaskId, 2, "Plan_Tasks")
+        self.assertRaises(
+            Exception, self.masterWorkbookService.getTaskId, 2, "Plan_Tasks")
 
     ##
     # Get Project ID method
@@ -37,7 +40,8 @@ class MasterWorkbookServiceTest(unittest.TestCase):
         self.assertEqual(projectId, 3)
 
     def testFailIncorrectProjectNameGetProjectId(self) -> None:
-        self.assertRaises(Exception, self.masterWorkbookService.getProjectId, "InvalidProject")
+        self.assertRaises(
+            Exception, self.masterWorkbookService.getProjectId, "InvalidProject")
 
     ##
     # Get Active Projects method
@@ -47,23 +51,26 @@ class MasterWorkbookServiceTest(unittest.TestCase):
 
     def testProjectStatusGetActiveProjects(self) -> None:
         for project in self.activeProjects:
-            if(project.status.lower() != "active"):
+            if (project.status.lower() != "active"):
                 self.assertEqual(project.status.lower(), "active")
         self.assertTrue(True)
-    
+
     ##
     # Get Active Tasks by Project ID
     ##
     def testSuccessGetActiveTasksByProjectId(self) -> None:
-        activeTasksList = self.masterWorkbookService.getActiveTasksByProjectId(1)
+        activeTasksList = self.masterWorkbookService.getActiveTasksByProjectId(
+            1)
         self.assertEqual(len(activeTasksList), 3)
 
     def testSuccessNoActiveTasksGetActiveTasksByProjectId(self) -> None:
-        activeTasksList = self.masterWorkbookService.getActiveTasksByProjectId(2)
+        activeTasksList = self.masterWorkbookService.getActiveTasksByProjectId(
+            2)
         self.assertEqual(len(activeTasksList), 0)
 
     def testFailIncorrectProjectIdGetActiveTasksByProjectId(self) -> None:
-        self.assertRaises(Exception, self.masterWorkbookService.getActiveTasksByProjectId, -1)
+        self.assertRaises(
+            Exception, self.masterWorkbookService.getActiveTasksByProjectId, -1)
 
     ##
     # Get Task Types
@@ -71,6 +78,7 @@ class MasterWorkbookServiceTest(unittest.TestCase):
     def testSuccessGetTaskTypes(self) -> None:
         taskTypesList = self.masterWorkbookService.getTaskTypes()
         self.assertEqual(len(taskTypesList), 8)
+
 
 if __name__ == "__main__":
     unittest.main()

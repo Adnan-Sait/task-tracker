@@ -16,7 +16,7 @@ from utilities.Constants import Constants
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.worksheet.worksheet import Worksheet
 
-from pandas.io.excel._base import ExcelFile,DataFrame
+from pandas.io.excel._base import ExcelFile, DataFrame
 
 from openpyxl import load_workbook
 
@@ -26,15 +26,18 @@ with open('./resources/config.yml') as configFile:
 FILE_PATH = configurationValues['filePath']
 FILE_DESTINATION_PATH = configurationValues['fileDestinationPath']
 TASK_TRACKER_TEMPLATE_PATH = configurationValues['taskTrackerTemplatePath']
-DATE_RECORDED_SHEET_IDENTIFIER = configurationValues['excelConfiguration']['dataTableColumns']['date']
+DATE_RECORDED_SHEET_IDENTIFIER = configurationValues[
+    'excelConfiguration']['dataTableColumns']['date']
 CATEGORY_SHEET_IDENTIFIER = configurationValues['excelConfiguration']['dataTableColumns']['category']
-PROJECT_NAME_SHEET_IDENTIFIER = configurationValues['excelConfiguration']['dataTableColumns']['project']
+PROJECT_NAME_SHEET_IDENTIFIER = configurationValues[
+    'excelConfiguration']['dataTableColumns']['project']
 TASK_NAME_SHEET_IDENTIFIER = configurationValues['excelConfiguration']['dataTableColumns']['task']
 TYPE_SHEET_IDENTIFIER = configurationValues['excelConfiguration']['dataTableColumns']['type']
 START_TIME_SHEET_IDENTIFIER = configurationValues['excelConfiguration']['dataTableColumns']['startTime']
 END_TIME_SHEET_IDENTIFIER = configurationValues['excelConfiguration']['dataTableColumns']['endTime']
 DURATION_SHEET_IDENTIFIER = configurationValues['excelConfiguration']['dataTableColumns']['duration']
-DESCRIPTION_SHEET_IDENTIFIER = configurationValues['excelConfiguration']['dataTableColumns']['description']
+DESCRIPTION_SHEET_IDENTIFIER = configurationValues[
+    'excelConfiguration']['dataTableColumns']['description']
 CATEGORY_CONST_DICT = configurationValues['excelConfiguration']['categoryDict']
 PRAYER_DEFAULT = configurationValues['defaultPrayer']
 CELL_IDENTIFIER = configurationValues['excelConfiguration']['cellAddress']
@@ -44,69 +47,77 @@ USE_DATABASE = configurationValues["useDatabase"]
 if (USE_DATABASE == "True"):
     import database.ExcelDatabase as excelDatabase
 else:
-    excelDatabase = MasterWorkbookService(configurationValues["masterSheetPath"])
+    excelDatabase = MasterWorkbookService(
+        configurationValues["masterSheetPath"])
+
 
 def parseUnixTime(fileName: str) -> float:
     """Parses the Unix timestamp from the file name
-    
+
     Arguments:
         fileName {str} -- [description]
-    
+
     Returns:
         [float] -- [description]
     """
     currentDate = getDateRecordedFromFileName(fileName)
-    unixTime = time.mktime(datetime.datetime.strptime(currentDate.strftime("%d/%m/%Y"), "%d/%m/%Y").timetuple())
+    unixTime = time.mktime(datetime.datetime.strptime(
+        currentDate.strftime("%d/%m/%Y"), "%d/%m/%Y").timetuple())
     return unixTime
+
 
 def getFile(filename: str) -> ExcelFile:
     """Reads Data from an Excel Sheet
-    
+
     Arguments:
         filename {str} -- [description]
-    
+
     Returns:
         ExcelFile -- [description]
     """
     excelFile = pd.ExcelFile(FILE_PATH+'/'+filename)
     return excelFile
 
+
 def deleteFile(filename: str):
     """Deletes the specified filename from the preconfigured directory
-    
+
     Arguments:
         filename {str} -- [description]
     """
     shutil.move(FILE_PATH+'/'+filename, FILE_DESTINATION_PATH+"/"+filename)
 
-def readDataFromSheet(excelFile:ExcelFile, sheetName:str, startRow=0) -> DataFrame:
+
+def readDataFromSheet(excelFile: ExcelFile, sheetName: str, startRow=0) -> DataFrame:
     """Reads data from the Excel Sheet
-    
+
     Arguments:
         excelFile {ExcelFile} -- [description]
         sheetName {str} -- [description]
-    
+
     Keyword Arguments:
         startRow {int} -- [description] (default: {0})
-    
+
     Returns:
         DataFrame -- [description]
     """
     sheetData = excelFile.parse(sheetName, startRow)
     return sheetData
 
-def consolidateSheetData(dateRecorded:datetime.date, sheetData:DataFrame) -> ExcelDataConsolidation:
+
+def consolidateSheetData(dateRecorded: datetime.date, sheetData: DataFrame) -> ExcelDataConsolidation:
     """Consolidates the Excel sheet data and creates an ExcelDataConsolidation object
-    
+
     Returns:
         ExcelDataConsolidation -- consolidates sheet data
     """
     excelDataConsolidated = ExcelDataConsolidation()
-    
+
     excelDataConsolidated.setDateRecorded(dateRecorded)
-    excelDataConsolidated.setStartTime(sheetData[START_TIME_SHEET_IDENTIFIER][0])
+    excelDataConsolidated.setStartTime(
+        sheetData[START_TIME_SHEET_IDENTIFIER][0])
     excelDataConsolidated.setLeavingTime(getLeavingTime(sheetData))
-    
+
     workDuration = 0
     breakDuration = 0
     lunchDuration = 0
@@ -115,7 +126,8 @@ def consolidateSheetData(dateRecorded:datetime.date, sheetData:DataFrame) -> Exc
             continue
         if sheetData[CATEGORY_SHEET_IDENTIFIER][index].lower() == CATEGORY_CONST_DICT['work']:
             workDuration += sheetData[DURATION_SHEET_IDENTIFIER][index]/60
-            projectDict = processProjectTaskDict(sheetData.loc[index], excelDataConsolidated.getProjectDict())
+            projectDict = processProjectTaskDict(
+                sheetData.loc[index], excelDataConsolidated.getProjectDict())
             excelDataConsolidated.setProjectDict(projectDict)
         else:
             breakDuration += (sheetData[DURATION_SHEET_IDENTIFIER][index])/60
@@ -126,13 +138,14 @@ def consolidateSheetData(dateRecorded:datetime.date, sheetData:DataFrame) -> Exc
     excelDataConsolidated.setLunchDuration(lunchDuration)
     return excelDataConsolidated
 
-def processProjectTaskDict(sheetData:DataFrame, projTaskDict:dict) -> dict:
+
+def processProjectTaskDict(sheetData: DataFrame, projTaskDict: dict) -> dict:
     """Populates the specified task details into the current projectDict and returns a copy of the dictionary
-    
+
     Arguments:
         sheetData {DataFrame} -- [description]
         projTaskDict {dict} -- [description]
-    
+
     Returns:
         dict -- [description]
     """
@@ -156,14 +169,14 @@ def processProjectTaskDict(sheetData:DataFrame, projTaskDict:dict) -> dict:
         taskDict[DESCRIPTION_SHEET_IDENTIFIER] += " "+description+"."
     projectDict[projectName][taskName] = taskDict
     return projectDict
-    
 
-def populateDailyActivityObject(excelDataConsolidated:ExcelDataConsolidation) -> list:
+
+def populateDailyActivityObject(excelDataConsolidated: ExcelDataConsolidation) -> list:
     """Creates and Populates a DailyActivity objects
-    
+
     Arguments:
         excelDataConsolidated {ExcelDataConsolidation} -- [description]
-    
+
     Returns:
         list -- [description]
     """
@@ -173,19 +186,23 @@ def populateDailyActivityObject(excelDataConsolidated:ExcelDataConsolidation) ->
             dailyActivity = DailyActivity()
             dailyActivity.setDate(excelDataConsolidated.getDateRecorded())
             dailyActivity.setTaskId(getTaskId(projectName, taskName))
-            dailyActivity.setType(excelDataConsolidated.getProjectDict()[projectName][taskName][TYPE_SHEET_IDENTIFIER])
-            dailyActivity.setEffort(excelDataConsolidated.getProjectDict()[projectName][taskName][DURATION_SHEET_IDENTIFIER])
-            dailyActivity.setDescription(excelDataConsolidated.getProjectDict()[projectName][taskName][DESCRIPTION_SHEET_IDENTIFIER])
+            dailyActivity.setType(excelDataConsolidated.getProjectDict()[
+                                  projectName][taskName][TYPE_SHEET_IDENTIFIER])
+            dailyActivity.setEffort(excelDataConsolidated.getProjectDict()[
+                                    projectName][taskName][DURATION_SHEET_IDENTIFIER])
+            dailyActivity.setDescription(excelDataConsolidated.getProjectDict()[
+                                         projectName][taskName][DESCRIPTION_SHEET_IDENTIFIER])
             dailyActivityList.append(dailyActivity)
     return dailyActivityList
 
-def populateDayOverview(excelDataConsolidated:ExcelDataConsolidation, overviewSheetData) -> DayOverview:
+
+def populateDayOverview(excelDataConsolidated: ExcelDataConsolidation, overviewSheetData) -> DayOverview:
     """Populates the Day Overview Object
-    
+
     Arguments:
         excelDataConsolidated {ExcelDataConsolidation} -- [description]
         overviewSheetData {[type]} -- [description]
-    
+
     Returns:
         DayOverview -- [description]
     """
@@ -194,16 +211,18 @@ def populateDayOverview(excelDataConsolidated:ExcelDataConsolidation, overviewSh
     else:
         prayer = not PRAYER_DEFAULT
     return DayOverview(excelDataConsolidated.getDateRecorded(), excelDataConsolidated.getStartTime(),
-        excelDataConsolidated.getLeavingTime(), excelDataConsolidated.getWorkHours(), excelDataConsolidated.getBreakHours(),
+                       excelDataConsolidated.getLeavingTime(), excelDataConsolidated.getWorkHours(
+    ), excelDataConsolidated.getBreakHours(),
         excelDataConsolidated.getLunchDuration(), getMorningScheduleId(overviewSheetData["Morning"][0]), prayer)
+
 
 def getTaskId(projectName: str, taskName: str) -> int:
     """Get Task ID
-    
+
     Arguments:
         projectName {str} -- [description]
         taskName {str} -- [description]
-    
+
     Returns:
         int -- [description]
     """
@@ -211,31 +230,34 @@ def getTaskId(projectName: str, taskName: str) -> int:
     taskId = excelDatabase.getTaskId(projectId, taskName)
     return taskId
 
-def getMorningScheduleId(morningSchedule:str) -> int:
+
+def getMorningScheduleId(morningSchedule: str) -> int:
     """Get morningScheduleId corresponding the morningSchedule Indicator
-    
+
     Arguments:
         morningSchedule {str} -- [description]
-    
+
     Returns:
         int -- [description]
     """
     if (USE_DATABASE == "True"):
-        morningScheduleMappingDict = {"B": 1, "B+SL": 2, "BC": 3, "BC+SL": 4, "SL": 5, "S": 6, "LL": 7}
+        morningScheduleMappingDict = {
+            "B": 1, "B+SL": 2, "BC": 3, "BC+SL": 4, "SL": 5, "S": 6, "LL": 7}
         return morningScheduleMappingDict[morningSchedule]
 
     morningScheduleMappingDict = excelDatabase.morningScheduleIdDetailsDict
     morningScheduleList = morningScheduleMappingDict.values()
     for scheduleObj in morningScheduleList:
         if (scheduleObj["morningScheduleRepresentation"] == morningSchedule):
-            return scheduleObj["morningScheduleId"]    
+            return scheduleObj["morningScheduleId"]
 
-def getDateRecordedFromFileName(filename:str) -> datetime.date:
+
+def getDateRecordedFromFileName(filename: str) -> datetime.date:
     """Parses the date recorded from the file name
-    
+
     Arguments:
         filename {str} -- [description]
-    
+
     Returns:
         datetime.date -- [description]
     """
@@ -243,33 +265,37 @@ def getDateRecordedFromFileName(filename:str) -> datetime.date:
     dateComponents = list(map(int, dateField.split("-")))
     return datetime.date(dateComponents[2], dateComponents[0], dateComponents[1])
 
+
 def saveDailyActivityList(dailyActivityList: list) -> list:
     """Persists the daily activity objects list into the Database
-    
+
     Arguments:
         dailyActivityList {list} -- [description]
-    
+
     Returns:
         list -- [description]
     """
-    dailyActivityRecordList = excelDatabase.saveBulkDailyActivity(dailyActivityList)
+    dailyActivityRecordList = excelDatabase.saveBulkDailyActivity(
+        dailyActivityList)
     return dailyActivityRecordList
+
 
 def saveDayOverview(dayOverview: DayOverview):
     """Persists the Day Overview record into the database
-    
+
     Arguments:
         dayOverview {DayOverview} -- [description]
-    
+
     Returns:
         [type] -- [description]
     """
     return excelDatabase.saveDayOverview(dayOverview)
 
+
 def getExcelFileNamesToBeProcessed() -> list:
     """Gets the list of daily activity files that match
     following regex pattern mm-dd-yyyy.xlsx
-    
+
     Returns:
         list -- [description]
     """
@@ -281,21 +307,22 @@ def getExcelFileNamesToBeProcessed() -> list:
     #     matchResult = re.match(patternObj, fileName)
     #     print(bool(matchResult))
     taskFileNameList = [fileName for fileName in fileList if (configurationValues['fileExtension'] in fileName)
-    and (not fileName.startswith("~$") and (re.match(configurationValues["taskSheetTitleRegex"], fileName)))]
-    taskFileNameList.sort(key = parseUnixTime, reverse=True)
+                        and (not fileName.startswith("~$") and (re.match(configurationValues["taskSheetTitleRegex"], fileName)))]
+    taskFileNameList.sort(key=parseUnixTime, reverse=True)
     return taskFileNameList
+
 
 def saveDailyActivityListAndDayOverview(dailyActivityList: list, dayOverview: DayOverview):
     """Saves the Daily Activity List and the Day Overview data
-    
+
     Arguments:
         dailyActivityList {list} -- [description]
         dayOverview {DayOverview} -- [description]
-    
+
     Raises:
         Exception: [description]
         Exception: [description]
-    
+
     Returns:
         [type] -- [description]
     """
@@ -308,43 +335,50 @@ def saveDailyActivityListAndDayOverview(dailyActivityList: list, dayOverview: Da
         raise Exception("Could not save DayOverview record")
     raise Exception("Could not save DailyActivityList")
 
+
 def createTaskTrackerWorkbook():
     """Creates the Daily Activity sheet
     """
-    taskTrackerFile = load_workbook(os.path.abspath(TASK_TRACKER_TEMPLATE_PATH))
+    taskTrackerFile = load_workbook(
+        os.path.abspath(TASK_TRACKER_TEMPLATE_PATH))
     fileName = datetime.datetime.now().strftime("%m-%d-%Y"+".xlsx")
 
     logSheet = taskTrackerFile["Sheet1"]
     dataValidationDict = {}
-    dataValidationDict[CELL_IDENTIFIER["taskName"]] = Constants.TASK_DATA_VALIDATION
-    
+    dataValidationDict[CELL_IDENTIFIER["taskName"]
+                       ] = Constants.TASK_DATA_VALIDATION
+
     consolidationSheet = taskTrackerFile["Consolidated"]
     projectTaskMapping = taskTrackerFile["Project-Task Mapping"]
     taskTypesSheet = taskTrackerFile["TaskTypes"]
 
     saveTaskTypesinSheet(taskTypesSheet)
     saveActiveProjectTaskMapping(projectTaskMapping)
-    consolidationSheet.cell(row = 2, column = 6).value = datetime.datetime.now().strftime("%I:%M %p")
+    consolidationSheet.cell(
+        row=2, column=6).value = datetime.datetime.now().strftime("%I:%M %p")
     addDataValidation(logSheet, dataValidationDict)
     taskTrackerFile.save(FILE_PATH+"/"+fileName)
 
-def addDataValidation(worksheet:Worksheet, cellFormulaDict:dict):
+
+def addDataValidation(worksheet: Worksheet, cellFormulaDict: dict):
     """Adds data validation to the specified worksheet
     on the listed cells mapped to the formula.
-    
+
     Arguments:
         worksheet {Worksheet} -- [description]
         cellFormulaDict {dict} -- Cell address is the key and the formula is the value
     """
     if cellFormulaDict[CELL_IDENTIFIER["taskName"]] is not None:
-        taskDataValidation = DataValidation(type="list", formula1=cellFormulaDict[CELL_IDENTIFIER["taskName"]], allow_blank=False)
+        taskDataValidation = DataValidation(
+            type="list", formula1=cellFormulaDict[CELL_IDENTIFIER["taskName"]], allow_blank=False)
         worksheet.add_data_validation(taskDataValidation)
         taskDataValidation.add(CELL_IDENTIFIER["taskName"])
+
 
 def getDefaultProjects() -> list:
     """Creates default projects as defined in the configuration
     with default task "-".
-    
+
     Returns:
         list -- List of Projects
     """
@@ -360,10 +394,11 @@ def getDefaultProjects() -> list:
         projectList.append(project)
     return projectList
 
-def saveActiveProjectTaskMapping(worksheet:Worksheet, startRow:int = 1, startColumn:int = 1):
+
+def saveActiveProjectTaskMapping(worksheet: Worksheet, startRow: int = 1, startColumn: int = 1):
     """Saves the active project list and active task list data.
     The projects are stored in one row, the tasks corresponding to the project are saved in the same column as the project
-    
+
     Arguments:
         worksheet {Worksheet} -- [description]
         startRow {int} -- starting row form where the data should be stored
@@ -391,7 +426,8 @@ def saveActiveProjectTaskMapping(worksheet:Worksheet, startRow:int = 1, startCol
             worksheet.cell(row=row, column=column).value = task.taskName
         column += 1
 
-def saveTaskTypesinSheet(worksheet:Worksheet, startRow:int = 2, column:int = 1):
+
+def saveTaskTypesinSheet(worksheet: Worksheet, startRow: int = 2, column: int = 1):
     """
     Saves the task types in the specified sheet
 
@@ -408,12 +444,13 @@ def saveTaskTypesinSheet(worksheet:Worksheet, startRow:int = 2, column:int = 1):
         worksheet.cell(row=row, column=column).value = taskType
         row += 1
 
+
 def getLeavingTime(sheetData: DataFrame) -> datetime:
     """Get the leaving time in the defined in the dataframe
-    
+
     Arguments:
         sheetData {DataFrame} -- [description]
-    
+
     Returns:
         datetime -- [description]
     """
