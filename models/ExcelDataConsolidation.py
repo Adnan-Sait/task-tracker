@@ -1,5 +1,6 @@
 import datetime
 
+
 class ExcelDataConsolidation:
 
     def __init__(self):
@@ -12,66 +13,66 @@ class ExcelDataConsolidation:
         self.__breakHours = 0               # type: float
         self.__lunchDuration = None         # type: float
         self.__prayer = False               # type: bool
-    
+
     def getDateRecorded(self) -> datetime.date:
         """Get recordedDate"""
         return self.__dateRecorded
 
-    def setDateRecorded(self, dateRecorded:datetime.date):
+    def setDateRecorded(self, dateRecorded: datetime.date):
         """Set DateRecorded"""
         self.__dateRecorded = dateRecorded
-    
+
     def getStartTime(self) -> datetime.time:
         """Get startTime"""
         return self.__startTime
-    
-    def setStartTime(self, startTime:datetime.time):
+
+    def setStartTime(self, startTime: datetime.time):
         """Set startTime"""
         self.__startTime = startTime
-    
+
     def getLeavingTime(self) -> datetime.time:
         """Get leavingTime"""
         return self.__leavingTime
-    
-    def setLeavingTime(self, leavingTime:datetime.time):
+
+    def setLeavingTime(self, leavingTime: datetime.time):
         """Set leavingTime"""
         self.__leavingTime = leavingTime
 
     def getProjectDict(self) -> dict:
         return self.__projectDict
-    
-    def setProjectDict(self, projectDict:dict):
+
+    def setProjectDict(self, projectDict: dict):
         self.__projectDict = projectDict
-    
+
     def getWorkHours(self) -> float:
         """Get Work Hours"""
         return self.__workHours
-    
-    def setWorkHours(self, workHours:float):
+
+    def setWorkHours(self, workHours: float):
         """Set Work Hours"""
         self.__workHours = workHours
-    
+
     def getBreakHours(self) -> float:
         """Get Break Hours"""
         return self.__breakHours
-    
-    def setBreakHours(self, breakHours:float):
+
+    def setBreakHours(self, breakHours: float):
         """Set Break Hours"""
         self.__breakHours = breakHours
-    
+
     def getLunchDuration(self) -> float:
         """Get Lunch Duration"""
         return self.__lunchDuration
-    
+
     def setLunchDuration(self, lunchDuration: float):
         """Set Lunch Duration"""
         self.__lunchDuration = lunchDuration
-    
+
     def getPrayer(self) -> bool:
         """Get Prayer"""
         return self.__prayer
-    
-    def setPrayer(self, prayer:bool):
+
+    def setPrayer(self, prayer: bool):
         """Set Prayer"""
         self.__prayer = prayer
 

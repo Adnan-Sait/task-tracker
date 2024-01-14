@@ -1,9 +1,10 @@
 import datetime
 
+
 class DayOverview:
 
     def __init__(self, dateRecorded, startTime, leavingTime, workHours,
-                breakHours, lunchDuration, morningScheduleId, prayer):
+                 breakHours, lunchDuration, morningScheduleId, prayer):
         """Instantiates the DayOverview Object"""
         self.dateRecorded = dateRecorded              # type: datetime.date
         self.startTime = startTime                    # type: datetime.time
@@ -13,7 +14,7 @@ class DayOverview:
         self.lunchDuration = lunchDuration            # type: float
         self.morningScheduleId = morningScheduleId    # type: int
         self.prayer = prayer                          # type: boolean
-    
+
     def __str__(self) -> str:
         return f"""[dateRecorded: {self.dateRecorded}, startTime: {self.startTime}, leavingTime: {self.leavingTime},
         workHours: {self.workHours}, breakHours: {self.breakHours}, lunchDuration: {self.lunchDuration},
