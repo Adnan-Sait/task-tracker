@@ -62,6 +62,7 @@ BEGIN;
 		"dailyActivityId" serial,
 		"dateRecorded" date NOT NULL,
 		"taskId" integer NOT NULL,
+		"taskType" character varying(255) NOT NULL,
 		"effort" double precision NOT NULL,
 		"description" text,
 		"createdTimestamp" timestamp with time zone DEFAULT current_timestamp,
