@@ -26,7 +26,8 @@ excelConfiguration:
 defaultPrayer: False
 defaultProject: ["Lunch", "-"]
 
-useDatabase: False
+dbConnectionDetails:
+  { database: "database", user: "user", password: "password" }
 
 # Master Worksheet Config
 masterSheetPath: "template/MasterSheet.xlsx"
