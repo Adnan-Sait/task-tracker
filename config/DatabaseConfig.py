@@ -1,14 +1,17 @@
 import psycopg2
 
 
+def initializeConnection():
+    """
+    Initializes and returns the database connection.
+    """
+    return psycopg2.connect(
+        database="TASKTRACKER", user="postgres", password="Infy123+")
+
+
 class DatabaseConfig:
 
-    __connection = None
-
-    @staticmethod
-    def initializeConnection():
-        DatabaseConfig.__connection = psycopg2.connect(
-            database="TASKTRACKER", user="postgres", password="Infy123+")
+    __connection = initializeConnection()
 
     @staticmethod
     def getConnection():
